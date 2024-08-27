@@ -17,11 +17,11 @@ void octal(int decimal);
 void hexadecimal(int decimal);
 void BCD(int decimal);
 void complemento_a2(int numero);
+void ponto_flutuante(double numero);
 
 int main()
 {
-    int numero, caso, escolha;
-    int numero_real;
+    int caso, escolha;
 
     while (caso != 0)
     {
@@ -42,6 +42,7 @@ int main()
 
             if (escolha == 0)
             {
+                int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
                 Sleep(500);
@@ -52,6 +53,7 @@ int main()
             }
             if (escolha == 1)
             {
+                int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
                 Sleep(500);
@@ -62,6 +64,7 @@ int main()
             }
             if (escolha == 2)
             {
+                int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
                 Sleep(500);
@@ -72,6 +75,7 @@ int main()
             }
             if (escolha == 3)
             {
+                int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
                 Sleep(500);
@@ -83,18 +87,22 @@ int main()
         }
         if (caso == 2)
         {
+            int numero;
             printf("Insira um numero inteiro de base 10: ");
-            scanf("%d", &numero_real);
+            scanf("%d", &numero);
             Sleep(500);
-            complemento_a2(numero_real);
+            complemento_a2(numero);
 
             printf("Obrigado!");
             break;
         }
         if (caso == 3)
         {
-            printf("Trabalhando nisso!");
+            double numero_flutuante;
+            printf("Insira um numero para ponto flutuante: ");
+            scanf("%lf", &numero_flutuante);
             Sleep(500);
+            ponto_flutuante(numero_flutuante);
             break;
         }
     }
@@ -104,7 +112,7 @@ int main()
 
 void binario(int decimal)
 {
-    char resultado[32];
+    char binario[32];
     int indice = 0;
 
     if (decimal == 0)
@@ -117,7 +125,7 @@ void binario(int decimal)
         while (decimal > 0)
         {
             printf("Decimal: %d, Decimal %% 2 = %d\n", decimal, decimal % 2);
-            resultado[indice] = decimal % 2;
+            binario[indice] = decimal % 2;
             indice++;
             decimal /= 2;
             Sleep(500);
@@ -127,7 +135,7 @@ void binario(int decimal)
         printf("Binario: ");
         for (int i = indice - 1; i >= 0; i--)
         {
-            printf("%d", resultado[i]);
+            printf("%d", binario[i]);
         }
     }
     printf("\n\n");
@@ -135,7 +143,7 @@ void binario(int decimal)
 
 void octal(int decimal)
 {
-    char resultado[32];
+    char octal[32];
     int indice = 0;
 
     Sleep(500);
@@ -149,7 +157,7 @@ void octal(int decimal)
         while (decimal > 0)
         {
             printf("Decimal: %d, Decimal %% 8 = %d\n", decimal, decimal % 8);
-            resultado[indice] = decimal % 8;
+            octal[indice] = decimal % 8;
             indice++;
             decimal /= 8;
             Sleep(500);
@@ -158,7 +166,7 @@ void octal(int decimal)
         printf("Octal: ");
         for (int i = indice - 1; i >= 0; i--)
         {
-            printf("%d", resultado[i]);
+            printf("%d", octal[i]);
         }
     }
     printf("\n\n");
@@ -166,7 +174,7 @@ void octal(int decimal)
 
 void hexadecimal(int decimal)
 {
-    char resultado[32];
+    char hexadecimal[32];
     int indice = 0;
 
     if (decimal == 0)
@@ -181,13 +189,13 @@ void hexadecimal(int decimal)
             int resto = decimal % 16;
             if (resto < 10)
             {
-                resultado[indice] = resto + '0';
+                hexadecimal[indice] = resto + '0';
             }
             else
             {
-                resultado[indice] = resto + 'A' - 10;
+                hexadecimal[indice] = resto + 'A' - 10;
             }
-            printf("Decimal %d, Decimal %% 16 = %d, Resto em Hexadecimal: %c\n", decimal, resto, resultado[indice]);
+            printf("Decimal %d, Decimal %% 16 = %d, Resto em Hexadecimal: %c\n", decimal, resto, hexadecimal[indice]);
             indice++;
             decimal /= 16;
             Sleep(500);
@@ -196,7 +204,7 @@ void hexadecimal(int decimal)
         printf("Hexadecimal: ");
         for (int i = indice - 1; i >= 0; i--)
         {
-            printf("%c", resultado[i]);
+            printf("%c", hexadecimal[i]);
         }
     }
     printf("\n\n");
@@ -204,7 +212,7 @@ void hexadecimal(int decimal)
 
 void BCD(int decimal)
 {
-    char resultado[32];
+    char bcd[32];
     int indice = 0;
 
     if (decimal == 0)
@@ -222,7 +230,7 @@ void BCD(int decimal)
             printf("Digito decimal: %d, Digito decimal %% 10 = %d\n", digito, digito);
             for (int i = 3; i >= 0; i--)
             {
-                resultado[indice * 4 + i] = (digito >> i) & 1;
+                bcd[indice * 4 + i] = (digito >> i) & 1;
             }
             indice++;
             Sleep(500);
@@ -231,7 +239,7 @@ void BCD(int decimal)
         printf("BCD: ");
         for (int i = indice * 4 - 1; i >= 0; i--)
         {
-            printf("%d", resultado[i]);
+            printf("%d", bcd[i]);
         }
         printf("\n\n");
     }
@@ -239,55 +247,77 @@ void BCD(int decimal)
 
 void complemento_a2(int numero)
 {
-    char resultado[16];
+    char comp_a2[16]; 
     int indice = 0;
+    int isNegative = 0;
+    int temp_num;
 
     if (numero == 0)
     {
-        printf("Complemento a 2 de 0 = 0");
+        printf("Complemento a 2 de 0 = 0\n");
+        return;
     }
-    if (numero > 0)
+    else if (numero < 0)
     {
-        printf("Convertendo %d para Binario:\n", numero);
-        while (numero > 0)
+        isNegative = 1;
+        temp_num = -numero;
+    }
+    else
+    {
+        temp_num = numero;
+    }
+
+    printf("Convertendo %d para Binario:\n", numero);
+    while (temp_num > 0)
+    {
+        printf("Decimal: %d, Decimal %% 2 = %d\n", temp_num, temp_num % 2);
+        comp_a2[indice] = temp_num % 2 + '0';
+        indice++;
+        temp_num /= 2;
+        Sleep(500);
+    }
+
+    // Completa os bits restantes com '0' se necessário para 16 bits
+    for (int i = indice; i < 16; i++)
+    {
+        comp_a2[i] = '0';
+    }
+    indice = 16;
+
+    printf("\nBinario sem Complemento a 2: ");
+    for (int i = indice - 1; i >= 0; i--)
+    {
+        printf("%c", comp_a2[i]);
+    }
+    printf("\n");
+
+    Sleep(500);
+
+    // Se o número for negativo, calcular complemento a 2
+    if (isNegative)
+    {
+        printf("\nBinario em Complemento a 1:\n");
+        for (int i = 0; i < indice; i++)
         {
-            printf("Decimal: %d, Decimal %% 2 = %d\n", numero, numero % 2);
-            resultado[indice] = numero % 2 + '0';
-            indice++;
-            numero /= 2;
+            if (comp_a2[i] == '0')
+            {
+                comp_a2[i] = '1';
+            }
+            else
+            {
+                comp_a2[i] = '0';
+            }
+            printf("Complemento a 1 passo %d: %c\n", i + 1, comp_a2[i]);
             Sleep(500);
         }
 
         Sleep(500);
-        printf("\nBinario sem Complemento a 2: ");
-        for (int i = indice - 1; i >= 0; i--)
-        {
-            printf("%c", resultado[i]);
-        }
-        printf("\n");
 
-        Sleep(500);
-
-        printf("\nBinario em Complemento a 1:\n");
-        for (int i = 0; i < indice; i++)
-        {
-            if (resultado[i] == '0')
-            {
-                resultado[i] = '1';
-            }
-            else
-            {
-                resultado[i] = '0';
-            }
-            printf("Complemento a 1 passo %d: %c\n", i + 1, resultado[i]);
-        }
-
-        Sleep(500);
         // Mostrando Resultado do Complemento a 1
         printf("\nResultado em Complemento a 1: ");
         for (int i = indice - 1; i >= 0; i--)
         {
-            printf("%c", resultado[i]);
+            printf("%c", comp_a2[i]);
         }
         printf("\n");
 
@@ -299,32 +329,97 @@ void complemento_a2(int numero)
         int carry = 1;
         for (int i = 0; i < indice; i++)
         {
-            if (resultado[i] == '1' && carry == 1)
+            if (comp_a2[i] == '1' && carry == 1)
             {
-                resultado[i] = '0';
+                comp_a2[i] = '0';
             }
-            else if (resultado[i] == '0' && carry == 1)
+            else if (comp_a2[i] == '0' && carry == 1)
             {
-                resultado[i] = '1';
+                comp_a2[i] = '1';
                 carry = 0;
             }
-            printf("Complemento a 2 passo %d: %c\n", i + 1, resultado[i]);
+            printf("Complemento a 2 passo %d: %c\n", i + 1, comp_a2[i]);
             Sleep(500);
         }
 
-        if (carry == 1)
+        if (carry == 1 && indice < 16)
         {
-            resultado[indice] = '1';
+            comp_a2[indice] = '1';
             indice++;
         }
+    }
 
-        Sleep(500);
+    Sleep(500);
 
-        printf("\nBinario com Complemento a 2: ");
-        for (int i = indice - 1; i >= 0; i--)
-        {
-            printf("%c", resultado[i]);
-        }
+    printf("\nBinario com Complemento a 2: ");
+    for (int i = indice - 1; i >= 0; i--)
+    {
+        printf("%c", comp_a2[i]);
     }
     printf("\n\n");
+}
+
+void ponto_flutuante(double numero)
+{
+    double parte_decimal, parte_inteira;
+    int inteiro = (int)parte_inteira;
+    int binario[32];
+    int i = 0;
+    int digitos = 0;
+
+    parte_decimal = modf(numero, &parte_inteira); // Separador da parte Inteira e Decimal
+
+    printf("Convertendo %.0f para Binario: \n", parte_inteira);
+    Sleep(500);
+
+    if (inteiro == 0)
+    {
+        printf("0");
+        return;
+    }
+
+    while (inteiro > 0)
+    {
+        printf("Decimal: %d, Decimal %% 2 = %d\n", inteiro, inteiro % 2);
+        binario[i] = inteiro % 2;
+        inteiro = inteiro / 2;
+        i++;
+    }
+
+    Sleep(500);
+    printf("Binario: ");
+    for (int j = i - 1; j >= 0; j--)
+    {
+        printf("%d", binario[j]);
+    }
+    printf("\nConvertendo a Parte Fracionaria: \n");
+    Sleep(500);
+
+    while (parte_decimal != 0 && digitos < 16)
+    {
+        parte_decimal *= 10;
+        parte_decimal = modf(parte_decimal, &parte_inteira);
+        digitos++;
+    }
+
+    char formato[10];
+    snprintf(formato, sizeof(formato), "%%.%df", digitos);
+
+    while (parte_decimal != 0.0 && digitos-- > 0)
+    {
+        printf("Fracionario: ");
+        printf(formato, parte_decimal);
+        printf("\n");
+        parte_decimal *= 2;
+        if (parte_decimal >= 1)
+        {
+            printf("1");
+            parte_decimal -= 1;
+        }
+        else
+        {
+            printf("0");
+        }
+    }
+    printf("\n");
 }
