@@ -4,6 +4,7 @@
  * Autor: Luan Kato
  * Questão 1 - 25/08/2024 02:05
  * Questão 2 - 26/08/2024 11:57
+ * Questão 3 - 29/08/2024 22:15
 
 **/
 
@@ -11,13 +12,30 @@
 #include <math.h>
 #include <stdlib.h>
 #include <windows.h>
+#include <stdint.h>
+
+typedef union
+{
+    float Float;
+    uint32_t bits;
+} FloatUnion;
+
+typedef union
+{
+    double Double;
+    uint64_t bits;
+} DoubleUnion;
 
 void binario(int decimal);
 void octal(int decimal);
 void hexadecimal(int decimal);
 void BCD(int decimal);
+
 void complemento_a2(int numero);
-void ponto_flutuante(double numero);
+
+void imprimir_formatado(uint64_t valor, int bits, int posicao_espacos[], int cont_espacos);
+void imprimir_bits_float(float num);
+void imprimir_bits_double(double num);
 
 int main()
 {
@@ -45,9 +63,11 @@ int main()
                 int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
+
                 Sleep(500);
                 binario(numero);
 
+                Sleep(500);
                 printf("Obrigado!");
                 break;
             }
@@ -56,9 +76,11 @@ int main()
                 int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
+
                 Sleep(500);
                 octal(numero);
 
+                Sleep(500);
                 printf("Obrigado!");
                 break;
             }
@@ -67,9 +89,11 @@ int main()
                 int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
+
                 Sleep(500);
                 hexadecimal(numero);
 
+                Sleep(500);
                 printf("Obrigado!");
                 break;
             }
@@ -78,9 +102,11 @@ int main()
                 int numero;
                 printf("Insira um numero inteiro natural de base 10: ");
                 scanf("%d", &numero);
+
                 Sleep(500);
                 BCD(numero);
 
+                Sleep(500);
                 printf("Obrigado!");
                 break;
             }
@@ -90,19 +116,32 @@ int main()
             int numero;
             printf("Insira um numero inteiro de base 10: ");
             scanf("%d", &numero);
+
             Sleep(500);
             complemento_a2(numero);
 
+            Sleep(500);
             printf("Obrigado!");
             break;
         }
         if (caso == 3)
         {
-            double numero_flutuante;
-            printf("Insira um numero para ponto flutuante: ");
-            scanf("%lf", &numero_flutuante);
+            float float_flutuante;
+            double double_flutuante;
+
+            printf("Digite um valor Float: ");
+            scanf("%f", &float_flutuante);
+            printf("Digite um valor Double: ");
+            scanf("%lf", &double_flutuante);
+
             Sleep(500);
-            ponto_flutuante(numero_flutuante);
+            imprimir_bits_float(float_flutuante);
+
+            Sleep(500);
+            imprimir_bits_double(double_flutuante);
+
+            Sleep(500);
+            printf("Obrigado!");
             break;
         }
     }
@@ -247,7 +286,7 @@ void BCD(int decimal)
 
 void complemento_a2(int numero)
 {
-    char comp_a2[16]; 
+    char comp_a2[16];
     int indice = 0;
     int isNegative = 0;
     int temp_num;
@@ -359,67 +398,96 @@ void complemento_a2(int numero)
     printf("\n\n");
 }
 
-void ponto_flutuante(double numero)
+void imprimir_formatado(uint64_t valor, int bits, int posicao_espacos[], int cont_espacos)
 {
-    double parte_decimal, parte_inteira;
-    int inteiro = (int)parte_inteira;
-    int binario[32];
-    int i = 0;
-    int digitos = 0;
-
-    parte_decimal = modf(numero, &parte_inteira); // Separador da parte Inteira e Decimal
-
-    printf("Convertendo %.0f para Binario: \n", parte_inteira);
-    Sleep(500);
-
-    if (inteiro == 0)
+    int espaco_atual = 0;
+    for (int i = bits - 1; i >= 0; i--)
     {
-        printf("0");
-        return;
-    }
-
-    while (inteiro > 0)
-    {
-        printf("Decimal: %d, Decimal %% 2 = %d\n", inteiro, inteiro % 2);
-        binario[i] = inteiro % 2;
-        inteiro = inteiro / 2;
-        i++;
-    }
-
-    Sleep(500);
-    printf("Binario: ");
-    for (int j = i - 1; j >= 0; j--)
-    {
-        printf("%d", binario[j]);
-    }
-    printf("\nConvertendo a Parte Fracionaria: \n");
-    Sleep(500);
-
-    while (parte_decimal != 0 && digitos < 16)
-    {
-        parte_decimal *= 10;
-        parte_decimal = modf(parte_decimal, &parte_inteira);
-        digitos++;
-    }
-
-    char formato[10];
-    snprintf(formato, sizeof(formato), "%%.%df", digitos);
-
-    while (parte_decimal != 0.0 && digitos-- > 0)
-    {
-        printf("Fracionario: ");
-        printf(formato, parte_decimal);
-        printf("\n");
-        parte_decimal *= 2;
-        if (parte_decimal >= 1)
+        printf("%d", (valor >> i) & 1);
+        if (espaco_atual < cont_espacos && (bits - 1) == posicao_espacos[espaco_atual])
         {
-            printf("1");
-            parte_decimal -= 1;
-        }
-        else
-        {
-            printf("0");
+            printf(" ");
+            espaco_atual++;
         }
     }
-    printf("\n");
+}
+
+void imprimir_bits_float(float num)
+{
+    FloatUnion unifloat;
+    unifloat.Float = num;
+
+    uint32_t sinal = (unifloat.bits >> 31) & 1;
+    uint32_t expoente = (unifloat.bits >> 23) & 0xFF;
+    uint32_t fracao = unifloat.bits & 0x7FFFFF;
+    int32_t vies_expoente = expoente - 127;
+
+    printf("\nNumero Float: %f\n", num);
+
+    printf("\nConvertendo para Binario...\n\n");
+    Sleep(500);
+
+    printf("Bits: ");
+    int posicoes_espaco[] = {1, 9};
+    imprimir_formatado(unifloat.bits, 32, posicoes_espaco, 2);
+
+    printf("\nVerificando se eh positivo ou negativo...\n\n");
+    Sleep(500);
+
+    printf("\nSinal: %u\n", sinal);
+
+    printf("\nCalculando Expoente...\n\n");
+    Sleep(500);
+
+    printf("Expoente: ");
+    imprimir_formatado(expoente, 8, NULL, 0);
+    printf("\nExpoente com vies: %d\n", vies_expoente);
+
+    printf("\nValor Flutuante completo...\n\n");
+    Sleep(500);
+
+    printf("Fracao: ");
+    imprimir_formatado(fracao, 23, NULL, 0);
+    printf("\n\n");
+}
+
+void imprimir_bits_double(double num)
+{
+    DoubleUnion unidouble;
+    unidouble.Double = num;
+
+    uint64_t sinal = (unidouble.bits >> 63) & 1;
+    uint64_t expoente = (unidouble.bits >> 52) & 0xFF;
+    uint64_t fracao = unidouble.bits & 0xFFFFFFFFFFFFF;
+    uint32_t vies_expoente = expoente - 1021;
+
+    Sleep(500);
+
+    printf("\nNumeroDouble: %lf\n", num);
+
+    printf("\nConvertendo para Binario...\n\n");
+    Sleep(500);
+
+    printf("Bits: ");
+    int posicoes_espacos[] = {1, 12};
+    imprimir_formatado(unidouble.bits, 64, posicoes_espacos, 2);
+
+    printf("\nVerificando se eh positivo ou negativo...\n\n");
+    Sleep(500);
+
+    printf("\nSinal: %llf\n", sinal);
+
+    printf("\nCalculando Expoente...\n\n");
+    Sleep(500);
+
+    printf("Expoente: ");
+    imprimir_formatado(expoente, 11, NULL, 0);
+    printf("\nExpoente com Vies: %d\n", vies_expoente);
+
+    printf("\nValor Flutuante completo...\n\n");
+    Sleep(500);
+
+    printf("Fracao: ");
+    imprimir_formatado(fracao, 52, NULL, 0);
+    printf("\n\n");
 }
